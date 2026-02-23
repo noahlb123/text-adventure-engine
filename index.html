@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Text Adventure Engine</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="background.js"></script>
+</head>
+<body>
+    <canvas id="canvas" style="display: block;"></canvas>
+    <input type="file" id="upload" name="upload" accept=".txt" />
+    <div id="main">
+        <div id="options"></div>
+    </div>
+<script>
+//setup background
+B = new Background(document.getElementById('canvas'));
+B.anim();
+const s = `
+
+`
+
+class TextEngine {
+    constructor(text, pElm, oElm) {
+        this.text = text;
+        this.pElm = pElm;
+        this.oElm = oElm;
+        this.option_map = {};
+        this.scene_map = {};
+        this.parse(this.text);
+        this.load(this.scene_map[Object.keys(this.scene_map)[0]]);
+    }
+
+    parse(text=this.text) {
+        var scenes = text.trim().slice(text.indexOf('#'), text.length).split('#');
+        scenes.forEach(scene => {
+            let name = scene.slice(0, scene.indexOf('\n')).trim().toLowerCase();
+            let body = scene.slice(scene.indexOf('/') + 1, scene.lastIndexOf('/')).trim();
+            let options = scene.indexOf('>') != -1 ? scene.slice(scene.indexOf('>') + 1, Math.max(scene.length, scene.lastIndexOf('>') + scene.slice(scene.lastIndexOf('>'), -1).indexOf('\n'))).split('>'): [];
+            for(let i = 0; i < options.length; i++) {
+                let option = options[i];
+                let key, value;
+                [key, value] = option.split(':');
+                this.option_map[name + '#' + key.trim()] = value.trim().toLowerCase();
+                options[i] = [key.trim(), value.trim().toLowerCase()];
+            }
+            this.scene_map[name] = {'body': body, 'options': options};
+        });
+    }
+
+    choose(scene_name, option_name) {
+        return this.scene_map[this.option_map[scene_name + '#' + option_name]];
+    }
+
+    load(scene_obj) {
+        this.pElm.innerHTML = '';
+        this.oElm.innerHTML = '';
+        this.pElm.appendChild(this.oElm);
+        scene_obj.body.split('\n').forEach(textLine => {
+            let p = document.createElement("p");
+            p.innerHTML = textLine == '' ? '\n': textLine;
+            this.pElm.insertBefore(p, this.oElm);
+        });
+        scene_obj.options.forEach(pair => {
+            let p = document.createElement("p");
+            p.innerHTML = pair[0];
+            p.onclick = () => this.load(this.scene_map[pair[1]]);
+            this.oElm.appendChild(p);
+        });
+    }
+}
+
+TE = new TextEngine(s, document.getElementById('main'), document.getElementById('options'));
+</script>
+</body>
+</html>
