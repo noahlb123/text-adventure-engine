@@ -1,10 +1,19 @@
 * {
     color: white;
     font-size: 30px;
+    margin:0;
+    padding:0;
 }
 
 body {
     background-color: black;
+    margin: none;
+}
+
+#in-front-canvas {
+    position: absolute;
+    inset-block-start: 0px;
+    inset-inline-start: 0px;
 }
 
 #main > p {
@@ -28,4 +37,10 @@ body {
     color: black;
     background-color: white;
     cursor: pointer;
+}
+
+#canvas {
+    position: relative;
+    top: 0px;
+    z-index: -1;
 }

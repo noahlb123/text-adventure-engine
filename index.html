@@ -8,17 +8,21 @@
 </head>
 <body>
     <canvas id="canvas" style="display: block;"></canvas>
-    <input type="file" id="upload" name="upload" accept=".txt" />
-    <div id="main">
-        <div id="options"></div>
+    <div id="in-front-canvas">
+        <input type="file" id="upload" name="upload" accept=".txt" />
+        <div id="main">
+            <p>Input a .txt text adventure file to begin.</p>
+            <div id="options"></div>
+        </div>
     </div>
 <script>
 //setup background
 B = new Background(document.getElementById('canvas'));
-B.anim();
-const s = `
-
-`
+function anim() {
+    B.draw();
+    requestAnimationFrame(anim);
+}
+anim();
 
 class TextEngine {
     constructor(text, pElm, oElm) {
@@ -27,16 +31,25 @@ class TextEngine {
         this.oElm = oElm;
         this.option_map = {};
         this.scene_map = {};
-        this.parse(this.text);
+    }
+
+    new(text) {
+        this.parse(text);
         this.load(this.scene_map[Object.keys(this.scene_map)[0]]);
+        console.log(this.scene_map);
     }
 
     parse(text=this.text) {
+        this.text = text;
+        this.option_map = {};
+        this.scene_map = {};
         var scenes = text.trim().slice(text.indexOf('#'), text.length).split('#');
         scenes.forEach(scene => {
+            console.log(scene);
+            if(!scene) {return;}
             let name = scene.slice(0, scene.indexOf('\n')).trim().toLowerCase();
             let body = scene.slice(scene.indexOf('/') + 1, scene.lastIndexOf('/')).trim();
-            let options = scene.indexOf('>') != -1 ? scene.slice(scene.indexOf('>') + 1, Math.max(scene.length, scene.lastIndexOf('>') + scene.slice(scene.lastIndexOf('>'), -1).indexOf('\n'))).split('>'): [];
+            let options = scene.indexOf('-') != -1 ? scene.slice(scene.indexOf('-') + 1, Math.max(scene.length, scene.lastIndexOf('-') + scene.slice(scene.lastIndexOf('-'), -1).indexOf('\n'))).split('-'): [];
             for(let i = 0; i < options.length; i++) {
                 let option = options[i];
                 let key, value;
@@ -70,7 +83,23 @@ class TextEngine {
     }
 }
 
-TE = new TextEngine(s, document.getElementById('main'), document.getElementById('options'));
+TE = new TextEngine('', document.getElementById('main'), document.getElementById('options'));
+
+//read input files
+inputElm = document.getElementById('upload');
+inputElm.addEventListener('change', () => {
+    const file = inputElm.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.readAsText(file, 'UTF-8');
+    reader.onload = function({ target }) {
+        TE.new(target.result);
+    }
+    reader.onerror = function() {
+        console.log('error reading file');
+    }
+});
 </script>
 </body>
 </html>
