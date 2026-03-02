@@ -8,16 +8,16 @@ This text adventure engine defines a simple system to create text based adventur
 
 ```#First Scene``` 
 
-3. On a newline, define the scene body text between two `/`:
+3. On a newline, define the scene body text between two `|`:
 
 ```
 #First Scene
-/Two roads diverged in a yellow wood,
+|Two roads diverged in a yellow wood,
 And sorry I could not travel both
 And be one traveler, long I stood
 And looked down one as far as I could
-To where it bent in the undergrowth;
--Robert Frost/
+To where it bent in the undergrowth
+Robert Frost|
 ```
 4. Then on newlines below the body, define options. For each option, begin with a `-`, followed by the text the user will see, then a `:` followed by the name of the scene that will result from choosing the option:
 ```
@@ -28,22 +28,22 @@ To where it bent in the undergrowth;
 5. After step 4, a scene is complete. The final step is to define new scenes for each option, ensuring that the new scene names exactly match the ones defined in the options. All together this looks like this:
 ```
 #First Scene
-/Two roads diverged in a yellow wood,
+|Two roads diverged in a yellow wood,
 And sorry I could not travel both
 And be one traveler, long I stood
 And looked down one as far as I could
-To where it bent in the undergrowth;
--Robert Frost/
+To where it bent in the undergrowth
+Robert Frost|
 -Take the road less traveled by: Poem Ending
 -Take the bend in the undergrowth: Custom Ending
 
 #Poem Ending
-/And that has made all the difference.
--Robert Frost/
+|And that has made all the difference.
+Robert Frost|
 
 #Custom Ending
-/I doubted if I should ever come back.
--Robert Frost/
+|I doubted if I should ever come back.
+Robert Frost|
 ```
 6. At this point you can upload the .txt file to the site and experience the user perspective.
 
@@ -63,9 +63,9 @@ Example:
 ```
 
 #Birthday scene
-/Unfortunately, the clock is ticking
+|Unfortunately, the clock is ticking
 the hours are going by. The past increases, the future recedes. Possibilities decreasing, regrets mounting:
-Do you understand?/
+Do you understand?|
 -I understand.:choose existentialism
 -remain ignorant:choose ignorance
 ```
@@ -90,12 +90,12 @@ Body text is the only thing the user will see in a scene, unless there are optio
 
 Requirements:
 * Must be preceded by a scene name
-* Must end and begin with a `/`
+* Must end and begin with a `|`
 
 Example:
 ```
 # Letter from Birmingham Jail
-/I have almost reached the regrettable conclusion that the Negro's great stumbling block in the stride toward freedom is not the White Citizen's Council-er or the Ku Klux Klanner, but the white moderate who is more devoted to "order" than to justice; who prefers a negative peace which is the absence of tension to a positive peace which is the presence of justice; who constantly says "I agree with you in the goal you seek, but I can't agree with your methods of direct action;" who paternalistically feels he can set the timetable for another man's freedom; who lives by the myth of time and who constantly advises the Negro to wait until a "more convenient season." -MLK April 1963/
+|I have almost reached the regrettable conclusion that the Negro's great stumbling block in the stride toward freedom is not the White Citizen's Council-er or the Ku Klux Klanner, but the white moderate who is more devoted to "order" than to justice; who prefers a negative peace which is the absence of tension to a positive peace which is the presence of justice; who constantly says "I agree with you in the goal you seek, but I can't agree with your methods of direct action;" who paternalistically feels he can set the timetable for another man's freedom; who lives by the myth of time and who constantly advises the Negro to wait until a "more convenient season." -MLK April 1963|
 ```
 # Options
 Options are the interactive component of the text engine that connect scenes together.
@@ -109,7 +109,7 @@ Requirements:
 Example:
 ```
 #Bridge Keeper's Riddle
-/What is the air-speed velocity of an unladen swallow?/
+|What is the air-speed velocity of an unladen swallow?|
 -40 miles per hour: Death
 -22 meters per second: Death
 -What do you mean? An African or European swallow?: Bridge Keeper Dies
@@ -130,38 +130,38 @@ Note: No newlines are allowed except one at the end of the scene name.
 ## Body Text
 
 ```
-/⌧
+|⌧
 With☑man☑gone,☑will☑there☑be☑hope☑for☑gorilla?☑
 ☑With☑gorilla☑gone☑will☑there☑be☑hope☑for☑man?☑
 -Daniel☑Quinn,☑Ishmael⌧
-⌧/
+⌧|
 ```
 
 ## Options
 Note: No newlines are allowed except one at the end of the option.
 
 ```
-/⌧
+|⌧
 -☑Cast☑Minor☑Illusion⌧:⌧Escape⌧
 ⌧
 -☑Cast☑Fireball⌧:⌧Death☑by☑fireball⌧
-⌧/
+⌧|
 ```
 
 # Special Characters
-The characters used to define each scene component (`#`, `/`, `-`, `:`) cannot be used as normal. Instead these characters must be preceded by the escape character `\` in order for them to function properly within the text of a scene component. Additionally, to display `\` in text, it must be preceded with an additional `\`:
+The characters used to define each scene component (`#`, `|`, `-`, `:`) cannot be used as normal. Instead these characters must be preceded by the escape character `\` in order for them to function properly within the text of a scene component. Additionally, to display `\` in text, it must be preceded with an additional `\`:
 
 | Proper escape format | Displayed as |
 | -------------------- | ------------ |
 |\\#                   | #            |
-|\\/                   | /            |
+|\\|                   | |            |
 |\\-                   | -            |
 |\\:                   | :            |
 |\\\\                  | \\           |
 
-Example body text (will be displayed as https://en.wikipedia.org/wiki/United_States_Armed_Forces#Budget)
+Example body text (will be displayed as https:||en.wikipedia.org|wiki|United_States_Armed_Forces#Budget)
 ```
-/
-https\:\/\/en.wikipedia.org\/wiki\/United_States_Armed_Forces\#Budget
-/
+|
+https\:\|\|en.wikipedia.org\|wiki\|United_States_Armed_Forces\#Budget
+|
 ```

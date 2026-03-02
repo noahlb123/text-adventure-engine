@@ -46,10 +46,7 @@ class Background {
         this.ctx = can.getContext('2d');
         this.win_width = window.innerWidth;
         this.win_height = window.innerHeight;
-        this.star_positions = [];
-        for(let i = 0; i < 100; i++) {
-            this.star_positions.push([this.win_width * Math.random(), this.win_height * Math.random()]);
-        }
+        this.setupStars();
     }
     //cross product
     cross(a, b) {
@@ -93,6 +90,13 @@ class Background {
     }
     rgbToHex(arr) {
         return "#" + arr.map(this.componentToHex).join("");
+    }
+    //setup stars
+    setupStars() {
+        this.star_positions = [];
+        for(let i = 0; i < 100; i++) {
+            this.star_positions.push([this.win_width * Math.random(), this.win_height * Math.random()]);
+        }
     }
     //draw house
     drawHouse(t) {
@@ -146,7 +150,7 @@ class Background {
             [this.win_width / 2, horizon - 0.1 * this.win_height],
             [this.win_width, horizon]
         ]
-        this.ctx.fillStyle = '#7aa011';
+        this.ctx.fillStyle = '#50690b';
         var path = new Path2D();
         path.moveTo(hillPoints[0][0], hillPoints[0][1]);
         for (let i = 1; i < hillPoints.length; i += 1) {
@@ -206,7 +210,15 @@ class Background {
     draw() {
         //resize
         this.win_width = window.innerWidth;
-        this.win_height = window.innerHeight;
+        let tempH = Math.max(
+            document.body.scrollHeight,
+            document.body.offsetHeight,
+            window.innerHeight,
+            document.documentElement.scrollHeight);
+        if (this.win_height != tempH) {
+            this.setupStars();
+        }
+        this.win_height = tempH;
         this.can.width = this.win_width;
         this.can.height = this.win_height;
         //time
