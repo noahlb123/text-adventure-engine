@@ -121,13 +121,13 @@ class Background {
         //sunset
         const horizon = 0.9 * this.win_height;
         let gradient = this.ctx.createLinearGradient(this.win_width/2, horizon, this.win_width/2, this.win_height - horizon);
-        gradient.addColorStop(0, this.rgbToHex(sunset_grad.at(sin_n)));
+        let sunset_color = sunset_grad.at(sin_n);
+        gradient.addColorStop(0, this.rgbToHex(sunset_color));
         gradient.addColorStop(0.7, this.rgbToHex(sky_grad.at(sin_n).concat(Math.floor(255 * sin_n))));
         gradient.addColorStop(1, this.rgbToHex(sky_grad.at(sin_n).concat(Math.floor(255 * sin_n))));
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(0, 0, this.win_width, this.win_height);
         //stars
-        channels = [Number('0xFF'), Number('0xFF'), Number('0xFF')];
         this.ctx.fillStyle = this.rgbToHex([Number('0xFF'), Number('0xFF'), Number('0xFF'), 100 * (10 ** sin_t) / 10]);
         for(let i = 0; i < this.star_positions.length; i++) {
             this.ctx.beginPath();
@@ -145,12 +145,16 @@ class Background {
         this.ctx.ellipse(Sx, Sy, r, r, 0, 0, 360);
         this.ctx.fill();
         //hills
+        let hill_grad = new CustomGradient([
+            [0, [Number('0x50'), Number('0x69'), Number('0x0b')]],
+            [1, sunset_color]
+        ]);
         let hillPoints = [
             [0, horizon],
             [this.win_width / 2, horizon - 0.1 * this.win_height],
             [this.win_width, horizon]
         ]
-        this.ctx.fillStyle = '#50690b';
+        this.ctx.fillStyle = this.rgbToHex(hill_grad.at(0.1));
         var path = new Path2D();
         path.moveTo(hillPoints[0][0], hillPoints[0][1]);
         for (let i = 1; i < hillPoints.length; i += 1) {
@@ -158,6 +162,17 @@ class Background {
         }
         this.ctx.fill(path);
         this.ctx.fillRect(0, horizon, this.win_width, this.win_height);
+        //shadow
+        /*this.ctx.fillStyle = "#00000050";
+        var path = new Path2D();
+        path.moveTo(hillPoints[0][0], hillPoints[0][1]);
+        for (let i = 0; i < hillPoints.length; i += 1) {
+            let s = this.shadow(hillPoints[i], Sx, Sy, horizon);
+            path.lineTo(s[0], s[1]);
+        }
+        console.log(hillPoints[-1][0]);
+        path.lineTo(hillPoints[-1][0], hillPoints[-1][1]);
+        this.ctx.fill(path);*/
         /*//body
         let hSizeFrac = 0.5;
         let hL = hSizeFrac * Math.min(this.win_width, this.win_height);

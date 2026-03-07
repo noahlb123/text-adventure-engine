@@ -54,3 +54,13 @@ a {
     top: 0px;
     z-index: -1;
 }
+
+#adventure-table > tr > td {
+    border: 1px solid white;
+    text-align: center;
+}
+
+#adventure-table > tr > td:hover {
+    background-color: #FFFFFF30;
+    cursor: pointer;
+}

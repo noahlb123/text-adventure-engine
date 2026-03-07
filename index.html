@@ -5,10 +5,12 @@
     <title>Text Adventure Engine</title>
     <link rel="stylesheet" href="style.css">
     <script src="background.js"></script>
+    <!--script src="tutorial.txt"></script-->
 </head>
 <body>
     <canvas id="canvas" style="display: block;"></canvas>
     <div id="in-front-canvas">
+        <table id="adventure-table"></table> 
         <input type="file" id="upload" name="upload" accept=".txt" />
         <div id="main">
             <p>Input a .txt text adventure file to begin.</p>
@@ -26,14 +28,15 @@ anim();
 
 class TextEngine {
     constructor(text, pElm, oElm) {
-        this.text = text;
         this.pElm = pElm;
         this.oElm = oElm;
         this.scene_map = {};
+        if (text) {
+            this.parse(text);
+        }
     }
 
-    new(text) {
-        this.parse(text);
+    loadFirst(text) {
         this.load(this.scene_map[Object.keys(this.scene_map)[0]]);
     }
 
@@ -45,7 +48,7 @@ class TextEngine {
         return s.replace(/◰/g, '#').replace(/◱/g, '-').replace(/◲/g, ':').replace(/◳/g, '`').replace(/◴/g, '\\');
     }
 
-    parse(text=this.text) {
+    parse(text) {
         text = this.escape(text);
         this.text = text;
         this.scene_map = {};
@@ -55,9 +58,6 @@ class TextEngine {
             let name = this.descape(scene.slice(0, scene.indexOf('\n')).trim().toLowerCase());
             let body = scene.slice(scene.indexOf('`') + 1, scene.lastIndexOf('`')).trim();
             let options = scene.indexOf('-') != -1 ? scene.slice(scene.indexOf('-') + 1, Math.max(scene.length, scene.lastIndexOf('-') + scene.slice(scene.lastIndexOf('-'), -1).indexOf('\n'))).split('-'): [];
-            console.log('name:', name);
-            console.log('body:', body);
-            console.log('options:', options);
             for(let i = 0; i < options.length; i++) {
                 let option = options[i];
                 let key, value;
@@ -69,6 +69,7 @@ class TextEngine {
     }
 
     load(scene_obj) {
+        table.style.display = 'none';
         this.pElm.innerHTML = '';
         this.oElm.innerHTML = '';
         this.pElm.appendChild(this.oElm);
@@ -88,22 +89,52 @@ class TextEngine {
 
 TE = new TextEngine('', document.getElementById('main'), document.getElementById('options'));
 
+//update table
+const table = document.getElementById('adventure-table');
+function updateTable() {
+    function insertCell(engine, index, html, row) {
+        let td = document.createElement("td");
+        td.onclick = () => engine.loadFirst();
+        td.innerHTML = html;
+        td.width = win_width / nCol;
+        td.height = win_width / nCol;
+        row.appendChild(td);
+    }
+    table.innerHTML = '';
+    let advKeys = Object.keys(adventures);
+    let win_width = window.innerWidth;
+    let nCol = win_width < 1000 ? 2: 4;
+    let nRow = Math.ceil(advKeys.length / nCol);
+    for(let r = 0; r < nRow; r++) {
+        let row = document.createElement("tr");
+        table.appendChild(row);
+        for(let c = 0; c < nCol; c++) {
+            let index = c * nRow + r;
+            if(index >= advKeys.length) {break;}
+            insertCell(adventures[advKeys[index]], index, advKeys[index], row);
+        }
+    }
+}
+
 //read input files
 inputElm = document.getElementById('upload');
+var adventures = {'input': inputElm, 'Tutorial': ''};
+updateTable();
 inputElm.addEventListener('change', () => {
     const file = inputElm.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.readAsText(file, 'UTF-8');
     reader.onload = function({ target }) {
         inputElm.style.display = 'none';
-        TE.new(target.result);
+        adventures[file.name.slice(0, file.name.length - 4)] = new TextEngine(target.result, document.getElementById('main'), document.getElementById('options'));
+        updateTable();
     }
     reader.onerror = function() {
         console.log('error reading file');
     }
 });
+fetch('./tutorial.txt').then(response => {console.log(response);});
 </script>
 </body>
 </html>
