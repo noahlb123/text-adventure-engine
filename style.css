@@ -15,11 +15,17 @@ a {
     color: blue;
 }
 
+input {
+    display: none;
+}
+
 #in-front-canvas {
     position: absolute;
     inset-block-start: 0px;
     inset-inline-start: 0px;
     width: 100%;
+    height: 100%;
+    overflow: scroll;
 }
 
 #main {
@@ -32,9 +38,10 @@ a {
 
 #options {
     display: block;
-    width: 50%;
+    width: calc(100% - 60px);
     margin: auto;
     margin-top: 30px;
+    margin-bottom: 20%;
 }
 
 #options > p {
@@ -49,10 +56,16 @@ a {
     cursor: pointer;
 }
 
-#canvas {
+#back-canvas {
     position: relative;
     top: 0px;
     z-index: -1;
+}
+
+#front-most-canvas {
+    position: absolute;
+    inset-block-start: 80%;
+    inset-inline-start: 0px;
 }
 
 #adventure-table > tr > td {
@@ -63,4 +76,12 @@ a {
 #adventure-table > tr > td:hover {
     background-color: #FFFFFF30;
     cursor: pointer;
+}
+
+#upload-label {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
 }

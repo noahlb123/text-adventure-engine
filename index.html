@@ -8,20 +8,22 @@
     <!--script src="tutorial.txt"></script-->
 </head>
 <body>
-    <canvas id="canvas" style="display: block;"></canvas>
+    <canvas id="back-canvas" style="display: block;"></canvas>
     <div id="in-front-canvas">
         <table id="adventure-table"></table> 
-        <input type="file" id="upload" name="upload" accept=".txt" />
-        <div id="main">
-            <p>Input a .txt text adventure file to begin.</p>
-            <div id="options"></div>
-        </div>
+        <label id="upload-label" for="upload" class="btn">Upload .txt Adventure</label>
+        <input type="file" id="upload" name="file" accept=".txt"/>
+        <div id="main"></div>
+        <div id="options"></div>
     </div>
+    <canvas id="front-most-canvas"></canvas>
 <script>
 //setup background
-B = new Background(document.getElementById('canvas'));
+B = new Background(document.getElementById('back-canvas'));
+F = new Background(document.getElementById('front-most-canvas'));
 function anim() {
     B.draw();
+    F.hill();
     requestAnimationFrame(anim);
 }
 anim();
@@ -92,12 +94,16 @@ TE = new TextEngine('', document.getElementById('main'), document.getElementById
 //update table
 const table = document.getElementById('adventure-table');
 function updateTable() {
-    function insertCell(engine, index, html, row) {
+    function createTd() {
         let td = document.createElement("td");
-        td.onclick = () => engine.loadFirst();
-        td.innerHTML = html;
         td.width = win_width / nCol;
         td.height = win_width / nCol;
+        return td;
+    }
+    function insertCell(engine, html, row) {
+        let td = createTd();
+        td.onclick = () => engine.loadFirst();
+        td.innerHTML = html;
         row.appendChild(td);
     }
     table.innerHTML = '';
@@ -109,32 +115,56 @@ function updateTable() {
         let row = document.createElement("tr");
         table.appendChild(row);
         for(let c = 0; c < nCol; c++) {
-            let index = c * nRow + r;
+            let index = c + nCol * r;
             if(index >= advKeys.length) {break;}
-            insertCell(adventures[advKeys[index]], index, advKeys[index], row);
+            if (index == 0) {
+                let td = createTd();
+                td.appendChild(inputLabel);
+                inputLabel.appendChild(inputElm);
+                row.appendChild(td);
+            } else {
+                insertCell(adventures[advKeys[index]], advKeys[index], row);
+            }
         }
     }
 }
 
 //read input files
 inputElm = document.getElementById('upload');
-var adventures = {'input': inputElm, 'Tutorial': ''};
-updateTable();
+inputLabel = document.getElementById('upload-label');
+var adventures = {'input': inputElm};
 inputElm.addEventListener('change', () => {
     const file = inputElm.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.readAsText(file, 'UTF-8');
     reader.onload = function({ target }) {
-        inputElm.style.display = 'none';
-        adventures[file.name.slice(0, file.name.length - 4)] = new TextEngine(target.result, document.getElementById('main'), document.getElementById('options'));
+        adventures[file.name.slice(0, file.name.length - 4)] = new TextEngine(
+            target.result,
+            document.getElementById('main'),
+            document.getElementById('options'));
         updateTable();
     }
     reader.onerror = function() {
         console.log('error reading file');
     }
 });
-fetch('./tutorial.txt').then(response => {console.log(response);});
+
+//load the tutorial adventure
+try {
+    fetch('./tutorial.txt').then(response => {
+        adventures.append({'Tutorial': new TextEngine(
+                response.text(),
+                document.getElementById('main'),
+                document.getElementById('options'))
+            });
+        });
+} catch(e) {console.log(e);}
+updateTable();
+
+window.onresize = () => {
+    updateTable();
+}
 </script>
 </body>
 </html>

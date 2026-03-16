@@ -95,8 +95,42 @@ class Background {
     setupStars() {
         this.star_positions = [];
         for(let i = 0; i < 100; i++) {
-            this.star_positions.push([this.win_width * Math.random(), this.win_height * Math.random()]);
+            this.star_positions.push([
+                this.win_width * Math.random(),
+                this.win_height * Math.random(),
+                Math.PI * 2 * Math.random()]);
         }
+    }
+    //draw hill
+    hill() {
+        //resize
+        this.win_width = window.innerWidth;
+        let tempH = Math.max(
+            document.body.scrollHeight,
+            document.body.offsetHeight,
+            window.innerHeight,
+            document.documentElement.scrollHeight);
+        if (this.win_height != tempH) {
+            this.setupStars();
+        }
+        this.win_height = tempH;
+        this.can.width = this.win_width;
+        this.can.height = 0.2 * this.win_height;
+        //hill
+        const horizon = this.can.height / 2;
+        let hillPoints = [
+            [0, horizon],
+            [this.win_width / 2, 0],
+            [this.win_width, horizon]
+        ]
+        this.ctx.fillStyle = '#50690B';
+        var path = new Path2D();
+        path.moveTo(hillPoints[0][0], hillPoints[0][1]);
+        for (let i = 1; i < hillPoints.length; i += 1) {
+            path.lineTo(hillPoints[i][0], hillPoints[i][1]);
+        }
+        this.ctx.fill(path);
+        this.ctx.fillRect(0, horizon - 1, this.win_width, this.win_height + 2);
     }
     //draw house
     drawHouse(t) {
@@ -131,6 +165,7 @@ class Background {
         this.ctx.fillStyle = this.rgbToHex([Number('0xFF'), Number('0xFF'), Number('0xFF'), 100 * (10 ** sin_t) / 10]);
         for(let i = 0; i < this.star_positions.length; i++) {
             this.ctx.beginPath();
+            let [x, y, speed] = this.star_positions[i];
             this.ctx.ellipse(this.star_positions[i][0], this.star_positions[i][1], 3, 3, 0, 0, 360);
             this.ctx.fill();
         };
