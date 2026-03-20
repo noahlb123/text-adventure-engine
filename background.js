@@ -94,43 +94,13 @@ class Background {
     //setup stars
     setupStars() {
         this.star_positions = [];
-        for(let i = 0; i < 100; i++) {
+        for(let i = 0; i < 500; i++) {
             this.star_positions.push([
                 this.win_width * Math.random(),
                 this.win_height * Math.random(),
-                Math.PI * 2 * Math.random()]);
+                255 * Math.random()
+            ])
         }
-    }
-    //draw hill
-    hill() {
-        //resize
-        this.win_width = window.innerWidth;
-        let tempH = Math.max(
-            document.body.scrollHeight,
-            document.body.offsetHeight,
-            window.innerHeight,
-            document.documentElement.scrollHeight);
-        if (this.win_height != tempH) {
-            this.setupStars();
-        }
-        this.win_height = tempH;
-        this.can.width = this.win_width;
-        this.can.height = 0.2 * this.win_height;
-        //hill
-        const horizon = this.can.height / 2;
-        let hillPoints = [
-            [0, horizon],
-            [this.win_width / 2, 0],
-            [this.win_width, horizon]
-        ]
-        this.ctx.fillStyle = '#50690B';
-        var path = new Path2D();
-        path.moveTo(hillPoints[0][0], hillPoints[0][1]);
-        for (let i = 1; i < hillPoints.length; i += 1) {
-            path.lineTo(hillPoints[i][0], hillPoints[i][1]);
-        }
-        this.ctx.fill(path);
-        this.ctx.fillRect(0, horizon - 1, this.win_width, this.win_height + 2);
     }
     //draw house
     drawHouse(t) {
@@ -150,8 +120,6 @@ class Background {
         ]);
         let sin_t = Math.sin(t / t_day);
         let sin_n = (-sin_t + 1) / 2;
-        //this.ctx.fillStyle = '#000000';//this.rgbToHex(sky_grad.at(sin_n));
-        //this.ctx.fillRect(0, 0, this.win_width, this.win_height);
         //sunset
         const horizon = 0.9 * this.win_height;
         let gradient = this.ctx.createLinearGradient(this.win_width/2, horizon, this.win_width/2, this.win_height - horizon);
@@ -162,99 +130,30 @@ class Background {
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(0, 0, this.win_width, this.win_height);
         //stars
-        this.ctx.fillStyle = this.rgbToHex([Number('0xFF'), Number('0xFF'), Number('0xFF'), 100 * (10 ** sin_t) / 10]);
         for(let i = 0; i < this.star_positions.length; i++) {
+            let [x, y, brightness] = this.star_positions[i];
+            this.ctx.fillStyle = this.rgbToHex([brightness, brightness, brightness, 100 * (10 ** sin_t) / 10]);
             this.ctx.beginPath();
-            let [x, y, speed] = this.star_positions[i];
             this.ctx.ellipse(this.star_positions[i][0], this.star_positions[i][1], 3, 3, 0, 0, 360);
             this.ctx.fill();
         };
         //draw sun
         this.ctx.fillStyle = "#FFFF00";
-        //this.ctx.strokeStyle = "#FFFF00";
         this.ctx.beginPath();
         const r = 20;
         const sR = this.win_width / 2 - r;
-        const Sx = this.win_width / 2 + horizon * Math.cos(t / t_day);
-        const Sy = horizon + horizon * sin_t;
-        this.ctx.ellipse(Sx, Sy, r, r, 0, 0, 360);
+        let Sx = this.win_width / 2 + horizon * Math.cos(t / t_day);
+        let Sy = horizon + horizon * sin_t;
+        this.ctx.ellipse(Sx, Sy, r, r, 0, 0, 2 * Math.PI);
         this.ctx.fill();
-        //hills
-        let hill_grad = new CustomGradient([
-            [0, [Number('0x50'), Number('0x69'), Number('0x0b')]],
-            [1, sunset_color]
-        ]);
-        let hillPoints = [
-            [0, horizon],
-            [this.win_width / 2, horizon - 0.1 * this.win_height],
-            [this.win_width, horizon]
-        ]
-        this.ctx.fillStyle = this.rgbToHex(hill_grad.at(0.1));
-        var path = new Path2D();
-        path.moveTo(hillPoints[0][0], hillPoints[0][1]);
-        for (let i = 1; i < hillPoints.length; i += 1) {
-            path.lineTo(hillPoints[i][0], hillPoints[i][1]);
-        }
-        this.ctx.fill(path);
-        this.ctx.fillRect(0, horizon, this.win_width, this.win_height);
-        //shadow
-        /*this.ctx.fillStyle = "#00000050";
-        var path = new Path2D();
-        path.moveTo(hillPoints[0][0], hillPoints[0][1]);
-        for (let i = 0; i < hillPoints.length; i += 1) {
-            let s = this.shadow(hillPoints[i], Sx, Sy, horizon);
-            path.lineTo(s[0], s[1]);
-        }
-        console.log(hillPoints[-1][0]);
-        path.lineTo(hillPoints[-1][0], hillPoints[-1][1]);
-        this.ctx.fill(path);*/
-        /*//body
-        let hSizeFrac = 0.5;
-        let hL = hSizeFrac * Math.min(this.win_width, this.win_height);
-        let rPeak = hL / (1.5 * Math.sqrt(3));
-        const gb = this.ctx.createLinearGradient(0, this.win_height * (Math.sin(t / 1000 + Math.PI) + 1) / 2, 0, this.win_height);
-        gb.addColorStop(0, '#DDDDFF');
-        gb.addColorStop(0.5, '#FFDDDD');
-        gb.addColorStop(1, '#e87836');
-        this.ctx.fillStyle = gb;
-        this.ctx.fillRect(this.win_width / 2 - hL / 2, rPeak, hL, hL);
-        //roof
-        let roofPoints = [
-            [this.win_width / 2 - hL / 2, rPeak],
-            [this.win_width / 2 - hL / 2 - 0.1 * hL, rPeak],
-            [this.win_width / 2, 0],
-            [this.win_width / 2 + hL / 2 + 0.1 * hL, rPeak],
-            [this.win_width / 2 + hL / 2, rPeak]
-        ];
-        const gr = this.ctx.createLinearGradient(0, this.win_height * (Math.sin(t / 1000 + Math.PI) + 1) / 2, 0, this.win_height);
-        gr.addColorStop(0, '#777799');
-        gr.addColorStop(0.5, '#997777');
-        gr.addColorStop(1, '#e87836');
-        this.ctx.fillStyle = gr;
-        var path = new Path2D();
-        path.moveTo(roofPoints[0][0], roofPoints[0][1]);
-        for (let i = 1; i < 5; i += 1) {
-            path.lineTo(roofPoints[i][0], roofPoints[i][1]);
-        }
-        this.ctx.fill(path);
-        //draw sun
-        this.ctx.fillStyle = "#FFFF00";
+        //draw moon
+        let opacity = 100 * (10 ** sin_t) / 10;
+        Sx = this.win_width / 2 + horizon * Math.cos(t / t_day + Math.PI);
+        Sy = horizon + horizon * Math.sin(t / t_day + Math.PI);
+        this.ctx.fillStyle = '#bababa';
         this.ctx.beginPath();
-        const sR = 1 * hL;
-        const Sx = this.win_width / 2 + sR * Math.cos(t / 1000);
-        const Sy = hL / 2 + rPeak + sR * Math.sin(t / 1000);
-        this.ctx.ellipse(Sx, Sy, 20, 20, 0, 0, 360);
+        this.ctx.ellipse(Sx, Sy, r, r, (t / t_day + Math.PI) % (2 * Math.PI), 0, Math.PI);
         this.ctx.fill();
-        //shadow
-        this.ctx.fillStyle = "#00000050";
-        var path = new Path2D();
-        path.moveTo(this.win_width / 2 - hL / 2, rPeak + hL);
-        for (let i = 0; i < 5; i += 1) {
-            let s = this.shadow(roofPoints[i], Sx, Sy, rPeak + hL);
-            path.lineTo(s[0], s[1] + rPeak + hL);
-        }
-        path.lineTo(this.win_width / 2 + hL / 2, rPeak + hL);
-        this.ctx.fill(path);*/
     }
     //animation
     draw() {

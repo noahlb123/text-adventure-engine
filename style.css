@@ -62,12 +62,6 @@ input {
     z-index: -1;
 }
 
-#front-most-canvas {
-    position: absolute;
-    inset-block-start: 80%;
-    inset-inline-start: 0px;
-}
-
 #adventure-table > tr > td {
     border: 1px solid white;
     text-align: center;

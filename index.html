@@ -16,14 +16,11 @@
         <div id="main"></div>
         <div id="options"></div>
     </div>
-    <canvas id="front-most-canvas"></canvas>
 <script>
 //setup background
 B = new Background(document.getElementById('back-canvas'));
-F = new Background(document.getElementById('front-most-canvas'));
 function anim() {
     B.draw();
-    F.hill();
     requestAnimationFrame(anim);
 }
 anim();
@@ -151,16 +148,20 @@ inputElm.addEventListener('change', () => {
 });
 
 //load the tutorial adventure
-try {
-    fetch('./tutorial.txt').then(response => {
-        adventures.append({'Tutorial': new TextEngine(
-                response.text(),
-                document.getElementById('main'),
-                document.getElementById('options'))
-            });
-        });
-} catch(e) {console.log(e);}
-updateTable();
+async function loadTutorial() {
+    try {
+        const response = await fetch('./tutorial.txt');
+        const tutorial = await response.text();
+        adventures['Tutorial'] = new TextEngine(
+            tutorial,
+            document.getElementById('main'),
+            document.getElementById('options')
+        );
+        updateTable();
+    } catch(e) {console.log(e);}
+}
+
+loadTutorial();
 
 window.onresize = () => {
     updateTable();
