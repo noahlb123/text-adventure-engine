@@ -62,8 +62,8 @@ class TextEngine {
                 let key, value;
                 [key, value] = option.split(':').map(this.descape);
                 options[i] = [key.trim(), value.trim().toLowerCase()];
-            }
             this.scene_map[name] = {'body': this.descape(body), 'options': options};
+            }
         });
     }
 
@@ -74,7 +74,7 @@ class TextEngine {
         this.pElm.appendChild(this.oElm);
         scene_obj.body.split('\n').forEach(textLine => {
             let p = document.createElement("p");
-            p.innerHTML = textLine == '' ? '<br>': textLine;
+            p.innerHTML = textLine.trim() == '' ? '<br>': textLine;
             this.pElm.insertBefore(p, this.oElm);
         });
         scene_obj.options.forEach(pair => {
@@ -150,7 +150,8 @@ inputElm.addEventListener('change', () => {
 //load the tutorial adventure
 async function loadTutorial() {
     try {
-        const response = await fetch('./tutorial.txt');
+        const url = 'https://noahlb123.github.io/text-adventure-engine/tutorial.txt';//'./tutorial.txt';
+        const response = await fetch(url);
         const tutorial = await response.text();
         adventures['Tutorial'] = new TextEngine(
             tutorial,
